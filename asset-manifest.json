@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/skillwill-dge-12/static/css/main.2d308ffd.css",
+    "main.js": "/skillwill-dge-12/static/js/main.9bd61f86.js",
+    "static/js/453.50fbae49.chunk.js": "/skillwill-dge-12/static/js/453.50fbae49.chunk.js",
+    "index.html": "/skillwill-dge-12/index.html",
+    "main.2d308ffd.css.map": "/skillwill-dge-12/static/css/main.2d308ffd.css.map",
+    "main.9bd61f86.js.map": "/skillwill-dge-12/static/js/main.9bd61f86.js.map",
+    "453.50fbae49.chunk.js.map": "/skillwill-dge-12/static/js/453.50fbae49.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2d308ffd.css",
+    "static/js/main.9bd61f86.js"
+  ]
+}
