@@ -1,36 +1,148 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import "./App.css";
+
+// es daimaxsovrebs da mxolod daa rerenderebs imdros rodesac ganxorcieldeba shecvla todoshi
+const TodoList = React.memo(({ items, onComplete, onDelete }) => {
+  return (
+    <div className="column">
+      <h2>გასაკეთებელი</h2>
+      <ul>
+        {items.length === 0 ? (
+          <li className="placeholder">
+            <p>ახალი დავალება დაემატება აქ</p>
+          </li>
+        ) : (
+          items.map((item, index) => (
+            <li key={index}>
+              {item}
+              <div className="button-group">
+                <button
+                  className="done-btn"
+                  onClick={() => {
+                    console.log(
+                      "დასრულება clicked, index:",
+                      index,
+                      "task:",
+                      item
+                    );
+                    onComplete(index);
+                  }}
+                >
+                  დასრულება
+                </button>
+                <button
+                  className="delete-btn"
+                  onClick={() => {
+                    console.log(
+                      "წაშლა (todo) clicked, index:",
+                      index,
+                      "task:",
+                      item
+                    );
+                    onDelete(index);
+                  }}
+                >
+                  წაშლა
+                </button>
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
+  );
+});
+
+TodoList.displayName = "TodoList";
+
+// es igives izams ogond dasrulebulebis mxares
+const DoneList = React.memo(({ items, onReturn, onDelete }) => {
+  return (
+    <div className="column">
+      <h2>გაკეთებული</h2>
+      <ul>
+        {items.length === 0 ? (
+          <li className="placeholder">
+            <p>თუ დაასრულე გადმოიტანე აქ</p>
+          </li>
+        ) : (
+          items.map((item, index) => (
+            <li key={index}>
+              {item}
+              <div className="button-group">
+                <button
+                  className="back-btn"
+                  onClick={() => {
+                    console.log("უკან clicked, index:", index, "task:", item);
+                    onReturn(index);
+                  }}
+                >
+                  უკან
+                </button>
+                <button
+                  className="delete-btn"
+                  onClick={() => {
+                    console.log(
+                      "წაშლა (done) clicked, index:",
+                      index,
+                      "task:",
+                      item
+                    );
+                    onDelete(index);
+                  }}
+                >
+                  წაშლა
+                </button>
+              </div>
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
+  );
+});
+
+DoneList.displayName = "DoneList";
 
 function App() {
   const [task, setTask] = useState("");
   const [todo, setTodo] = useState([]);
   const [done, setDone] = useState([]);
 
-  const damateba = () => {
+  const damateba = useCallback(() => {
+    console.log("დამატება (add) clicked, task:", task);
     if (task.trim() === "") return;
-    setTodo([...todo, task]);
+    setTodo((prevTodo) => [...prevTodo, task]);
     setTask("");
-  };
+  }, [task]);
 
-  const dasruleba = (index) => {
+  const dasruleba = useCallback((index) => {
+    console.log("dasruleba (complete) handler called, index:", index);
     const finishedTask = todo[index];
-    setDone([...done, finishedTask]);
-    setTodo(todo.filter((_, i) => i !== index));
-  };
+    console.log("Moving to done:", finishedTask);
+    setDone((prevDone) => [...prevDone, finishedTask]);
+    setTodo((prevTodo) => prevTodo.filter((_, i) => i !== index));
+  }, [todo]);
 
-  const ukandabruneba = (index) => {
-    const returnedTask = done[index];
-    setTodo([...todo, returnedTask]);
-    setDone(done.filter((_, i) => i !== index));
-  };
+  const ukandabruneba = useCallback((index) => {
+    console.log("ukandabruneba (return) handler called, index:", index);
+    setDone((prevDone) => {
+      const returnedTask = prevDone[index];
+      console.log("Moving back to todo:", returnedTask);
+      setTodo((prevTodo) => [...prevTodo, returnedTask]);
+      return prevDone.filter((_, i) => i !== index);
+    });
+  }, []);
 
-  const washla = (index) => {
-    setTodo(todo.filter((_, i) => i !== index));
-  };
+  const washla = useCallback((index) => {
+    console.log("washla (delete from todo) handler called, index:", index);
+    setTodo((prevTodo) => prevTodo.filter((_, i) => i !== index));
+  }, []);
 
-  const kidewashla = (index) => {
-    setDone(done.filter((_, i) => i !== index));
-  };
+  const kidewashla = useCallback((index) => {
+    console.log("kidewashla (delete from done) handler called, index:", index);
+    setDone((prevDone) => prevDone.filter((_, i) => i !== index));
+  }, []);
 
   return (
     <div className="app-container">
@@ -47,67 +159,8 @@ function App() {
       </div>
 
       <div className="columns">
-        <div className="column">
-          <h2>გასაკეთებელი</h2>
-          <ul>
-            {todo.length === 0 ? (
-              <li className="placeholder">
-                <p>ახალი დავალება დაემატება აქ</p>
-              </li>
-            ) : (
-              todo.map((item, index) => (
-                <li key={index}>
-                  {item}
-                  <div className="button-group">
-                    <button
-                      className="done-btn"
-                      onClick={() => dasruleba(index)}
-                    >
-                      დასრულება
-                    </button>
-                    <button
-                      className="delete-btn"
-                      onClick={() => washla(index)}
-                    >
-                      წაშლა
-                    </button>
-                  </div>
-                </li>
-              ))
-            )}
-          </ul>
-        </div>
-
-        <div className="column">
-          <h2>გაკეთებული</h2>
-          <ul>
-            {done.length === 0 ? (
-              <li className="placeholder">
-                <p>თუ დაასრულე გადმოიტანე აქ</p>
-              </li>
-            ) : (
-              done.map((item, index) => (
-                <li key={index}>
-                  {item}
-                  <div className="button-group">
-                    <button
-                      className="back-btn"
-                      onClick={() => ukandabruneba(index)}
-                    >
-                      უკან
-                    </button>
-                    <button
-                      className="delete-btn"
-                      onClick={() => kidewashla(index)}
-                    >
-                      წაშლა
-                    </button>
-                  </div>
-                </li>
-              ))
-            )}
-          </ul>
-        </div>
+        <TodoList items={todo} onComplete={dasruleba} onDelete={washla} />
+        <DoneList items={done} onReturn={ukandabruneba} onDelete={kidewashla} />
       </div>
     </div>
   );
